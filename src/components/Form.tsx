@@ -1,7 +1,20 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect, useRef } from 'react';
 import LabeledInput from './LabeledInput';
 
-const formFields = [
+interface IFormData {
+  id: number;
+  title: string;
+  formFields: IFormField[];
+}
+
+interface IFormField {
+  id: number;
+  label: string;
+  type: string;
+  value: string;
+}
+
+const formFields: IFormField[] = [
   { label: 'First Name', id: 1, type: 'text', value: '' },
   { label: 'Last Name', id: 2, type: 'text', value: '' },
   { label: 'Email', id: 3, type: 'email', value: '' },
@@ -9,41 +22,104 @@ const formFields = [
   { label: 'Date of Birth', id: 5, type: 'date', value: '' },
 ];
 
+const getLocalForms = (): IFormData[] => {
+  const savedForms = localStorage.getItem('forms') ?? '[]';
+  return JSON.parse(savedForms);
+};
+
+const initState = (): IFormData => {
+  const localForms = getLocalForms();
+  if (localForms.length > 0) return localForms[0];
+  const newForm = { title: 'Untitled', formFields, id: Number(new Date()) };
+  saveLocalForms([...localForms, newForm]);
+  return newForm;
+};
+
+const saveLocalForms = (localForms: IFormData[]) => {
+  localStorage.setItem('forms', JSON.stringify(localForms));
+};
+
+const saveFormData = (currState: IFormData) => {
+  const localForms = getLocalForms();
+  const updateLocalForms = localForms.map((form) =>
+    form.id === currState.id ? currState : form
+  );
+  saveLocalForms(updateLocalForms);
+};
+
 const Form = ({ closeFormCB }: { closeFormCB: () => void }) => {
-  const [state, setState] = useState(formFields);
+  const [state, setState] = useState(() => initState());
   const [newField, setNewField] = useState('');
+  const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      saveFormData(state);
+    }, 1000);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [state]);
+
+  useEffect(() => {
+    ref.current?.focus();
+  }, []);
 
   const addField = (e: FormEvent) => {
     e.preventDefault();
-    setState((state) => [
+    setState((state) => ({
       ...state,
-      { id: state.length + 1, label: newField, type: 'text', value: '' },
-    ]);
+      formFields: [
+        ...state.formFields,
+        {
+          id: state.formFields.length + 1,
+          label: newField,
+          type: 'text',
+          value: '',
+        },
+      ],
+    }));
     setNewField('');
   };
 
   const removeField = (id: number) => {
-    setState((state) => state.filter((field) => field.id !== id));
+    setState((state) => ({
+      ...state,
+      formFields: state.formFields.filter((field) => field.id !== id),
+    }));
   };
 
   const updateField = (id: number, newVal: string) => {
-    setState((state) =>
-      state.map((field) =>
+    setState((state) => ({
+      ...state,
+      formFields: state.formFields.map((field) =>
         field.id === id ? { ...field, value: newVal } : field
-      )
-    );
+      ),
+    }));
   };
 
   const clearForm = () => {
-    setState((state) => state.map((field) => ({ ...field, value: '' })));
+    setState((state) => ({
+      ...state,
+      formFields: state.formFields.map((field) => ({ ...field, value: '' })),
+    }));
   };
-
-  console.count('render');
 
   return (
     <div className='divide-y-2 divide-dashed space-y-5'>
       <div>
-        {state.map((field) => (
+        <input
+          type='text'
+          ref={ref}
+          value={state.title}
+          onChange={(e) => {
+            setState((state) => ({ ...state, title: e.target.value }));
+          }}
+          className='flex-1 border-2 border-gray-200 rounded-lg p-2  focus:outline-none focus:border-blue-500'
+        />
+      </div>
+      <div className='pt-4'>
+        {state.formFields.map((field) => (
           <LabeledInput
             key={field.id}
             id={field.id}
