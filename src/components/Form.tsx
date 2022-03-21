@@ -50,8 +50,8 @@ const Form = ({ closeFormCB }: { closeFormCB: () => void }) => {
             label={field.label}
             type={field.type}
             value={field.value}
-            removeField={removeField}
-            updateField={updateField}
+            removeFieldCB={removeField}
+            updateFieldCB={updateField}
           />
         ))}
       </div>
