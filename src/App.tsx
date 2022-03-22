@@ -2,7 +2,7 @@ import Header from './components/Header';
 import AppContainer from './components/AppContainer';
 import { useCallback, useState } from 'react';
 import Home from './components/Home';
-import Form from './components/Form';
+import FormContainer from './components/FormContainer';
 
 function App() {
   const [state, setState] = useState('HOME');
@@ -22,7 +22,7 @@ function App() {
         {state === 'HOME' ? (
           <Home openFormCB={openFormCB}></Home>
         ) : (
-          <Form closeFormCB={closeFormCB}></Form>
+          <FormContainer closeFormCB={closeFormCB} />
         )}
       </div>
     </AppContainer>

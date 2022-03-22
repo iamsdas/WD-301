@@ -1,43 +1,7 @@
 import { useState, FormEvent, useEffect, useRef } from 'react';
 import LabeledInput from './LabeledInput';
-
-interface IFormData {
-  id: number;
-  title: string;
-  formFields: IFormField[];
-}
-
-interface IFormField {
-  id: number;
-  label: string;
-  type: string;
-  value: string;
-}
-
-const formFields: IFormField[] = [
-  { label: 'First Name', id: 1, type: 'text', value: '' },
-  { label: 'Last Name', id: 2, type: 'text', value: '' },
-  { label: 'Email', id: 3, type: 'email', value: '' },
-  { label: 'Phone Number', id: 4, type: 'number', value: '' },
-  { label: 'Date of Birth', id: 5, type: 'date', value: '' },
-];
-
-const getLocalForms = (): IFormData[] => {
-  const savedForms = localStorage.getItem('forms') ?? '[]';
-  return JSON.parse(savedForms);
-};
-
-const initState = (): IFormData => {
-  const localForms = getLocalForms();
-  if (localForms.length > 0) return localForms[0];
-  const newForm = { title: 'Untitled', formFields, id: Number(new Date()) };
-  saveLocalForms([...localForms, newForm]);
-  return newForm;
-};
-
-const saveLocalForms = (localForms: IFormData[]) => {
-  localStorage.setItem('forms', JSON.stringify(localForms));
-};
+import { getLocalForms } from './FormList';
+import { IFormData, saveLocalForms } from './FormContainer';
 
 const saveFormData = (currState: IFormData) => {
   const localForms = getLocalForms();
@@ -47,8 +11,19 @@ const saveFormData = (currState: IFormData) => {
   saveLocalForms(updateLocalForms);
 };
 
-const Form = ({ closeFormCB }: { closeFormCB: () => void }) => {
-  const [state, setState] = useState(() => initState());
+const initState = (id: number) => {
+  const forms = getLocalForms();
+  return forms.find((form) => form.id === id)!;
+};
+
+const Form = ({
+  closeFormCB,
+  formId,
+}: {
+  closeFormCB: () => void;
+  formId: number;
+}) => {
+  const [state, setState] = useState(() => initState(formId));
   const [newField, setNewField] = useState('');
   const ref = useRef<HTMLInputElement>(null);
 
