@@ -51,7 +51,7 @@ const FormList = ({
 
   return (
     <div>
-      <div className='divide-y-2'>
+      <div className='divide-y-2 border-y-2 mb-2'>
         {forms.map((form) => (
           <div className='flex justify-between items-center py-2' key={form.id}>
             <div className='text-lg'>{form.title}</div>
