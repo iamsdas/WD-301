@@ -1,7 +1,8 @@
 import { useState, FormEvent, useEffect, useRef } from 'react';
 import LabeledInput from './LabeledInput';
-import { getLocalForms } from './FormList';
-import { IFormData, saveLocalForms } from './FormContainer';
+import { getLocalForms } from './Home';
+import { IFormData, saveLocalForms } from './Home';
+import { Link } from 'raviger';
 
 const saveFormData = (currState: IFormData) => {
   const localForms = getLocalForms();
@@ -16,13 +17,7 @@ const initState = (id: number) => {
   return forms.find((form) => form.id === id)!;
 };
 
-const Form = ({
-  closeFormCB,
-  formId,
-}: {
-  closeFormCB: () => void;
-  formId: number;
-}) => {
+const Form = ({ formId }: { formId: number }) => {
   const [state, setState] = useState(() => initState(formId));
   const [newField, setNewField] = useState('');
   const ref = useRef<HTMLInputElement>(null);
@@ -130,11 +125,11 @@ const Form = ({
           onClick={clearForm}>
           Clear Form
         </button>
-        <button
+        <Link
           className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg'
-          onClick={closeFormCB}>
+          href='/'>
           Close Form
-        </button>
+        </Link>
       </div>
     </div>
   );
