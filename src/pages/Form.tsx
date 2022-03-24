@@ -1,8 +1,8 @@
 import { useState, FormEvent, useEffect, useRef } from 'react';
-import LabeledInput from './LabeledInput';
 import { getLocalForms } from './Home';
-import { IFormData, saveLocalForms } from './Home';
+import { saveLocalForms } from './Home';
 import { Link } from 'raviger';
+import FormInput from '../components/FormInput';
 
 const saveFormData = (currState: IFormData) => {
   const localForms = getLocalForms();
@@ -59,19 +59,12 @@ const Form = ({ formId }: { formId: number }) => {
     }));
   };
 
-  const updateField = (id: number, newVal: string) => {
+  const updateLabel = (id: number, newLabel: string) => {
     setState((state) => ({
       ...state,
       formFields: state.formFields.map((field) =>
-        field.id === id ? { ...field, value: newVal } : field
+        field.id === id ? { ...field, label: newLabel } : field
       ),
-    }));
-  };
-
-  const clearForm = () => {
-    setState((state) => ({
-      ...state,
-      formFields: state.formFields.map((field) => ({ ...field, value: '' })),
     }));
   };
 
@@ -90,14 +83,11 @@ const Form = ({ formId }: { formId: number }) => {
       </div>
       <div className='pt-4'>
         {state.formFields.map((field) => (
-          <LabeledInput
+          <FormInput
             key={field.id}
-            id={field.id}
-            label={field.label}
-            type={field.type}
-            value={field.value}
+            field={field}
             removeFieldCB={removeField}
-            updateFieldCB={updateField}
+            updateLabelCB={updateLabel}
           />
         ))}
       </div>
@@ -111,20 +101,12 @@ const Form = ({ formId }: { formId: number }) => {
           className='flex-1 border-2 border-gray-200 rounded-lg p-2  focus:outline-none focus:border-blue-500'
         />
         <button
-          className='bg-blue-500 inline-flex hover:bg-blue-700 text-white text-md font-bold py-1 px-2 rounded-lg items-center'
+          className='bg-gray-500 hover:bg-gray-700 text-white text-md font-bold py-1 px-2 rounded-lg items-center'
           type='submit'>
           Add Field
         </button>
       </form>
       <div className='pt-4 flex gap-2'>
-        <button className='bg-blue-500 p-2 rounded-lg text-white font-bold'>
-          Submit
-        </button>
-        <button
-          className='bg-blue-500 p-2 rounded-lg text-white font-bold'
-          onClick={clearForm}>
-          Clear Form
-        </button>
         <Link
           className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg'
           href='/'>

@@ -1,25 +1,13 @@
 import { Link, useQueryParams } from 'raviger';
 import { useEffect, useState } from 'react';
 
-const formFields: IFormField[] = [
+const formFields: IField[] = [
   { label: 'First Name', id: 1, type: 'text', value: '' },
   { label: 'Last Name', id: 2, type: 'text', value: '' },
   { label: 'Email', id: 3, type: 'email', value: '' },
   { label: 'Phone Number', id: 4, type: 'number', value: '' },
   { label: 'Date of Birth', id: 5, type: 'date', value: '' },
 ];
-export interface IFormField {
-  id: number;
-  label: string;
-  type: string;
-  value: string;
-}
-
-export interface IFormData {
-  id: number;
-  title: string;
-  formFields: IFormField[];
-}
 
 export const saveLocalForms = (localForms: IFormData[]) => {
   localStorage.setItem('forms', JSON.stringify(localForms));
@@ -88,17 +76,24 @@ const FormList = () => {
             <div
               className='flex justify-between items-center py-2'
               key={form.id}>
-              <div className='text-lg'>{form.title}</div>
+              <Link href={`/preview/${form.id}`}>
+                <div className='flex flex-col'>
+                  <div className='text-lg hover:text-blue-600'>
+                    {form.title}
+                  </div>
+                  <div className='text-gray-500 text-sm'>{`${form.formFields.length} quizes`}</div>
+                </div>
+              </Link>
               <div className='flex gap-2'>
                 <Link
                   href={`/form/${form.id}`}
-                  className='bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg'>
-                  open
+                  className='bg-gray-500 hover:bg-gray-700 text-white font-semibold py-1 px-2 rounded-lg'>
+                  Edit
                 </Link>
                 <button
                   onClick={() => removeForm(form.id)}
-                  className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg'>
-                  remove
+                  className='bg-red-500 hover:bg-red-700 text-white font-semibold py-1 px-2 rounded-lg'>
+                  Remove
                 </button>
               </div>
             </div>
@@ -107,7 +102,7 @@ const FormList = () => {
       <div className='capitalize flex gap-2'>
         <button
           onClick={addNewForm}
-          className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg'>
+          className='bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-2 rounded-lg'>
           New Form
         </button>
       </div>

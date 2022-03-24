@@ -1,7 +1,7 @@
 import { ActiveLink } from 'raviger';
 import logo from '../logo.svg';
 
-const Header = (props: { title: string }) => {
+const Header = () => {
   return (
     <div className='flex gap-2 items-center font-semibold pb-4'>
       <img src={logo} className='animate-spin h-16' alt='logo' />
