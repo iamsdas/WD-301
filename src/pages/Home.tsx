@@ -21,31 +21,28 @@ export const getLocalForms = (): IFormData[] => {
   return newForms;
 };
 
-const addNewForm = () => {
-  const localForms = getLocalForms();
-  saveLocalForms([
-    ...localForms,
-    { title: 'Untitled', formFields, id: Number(new Date()) },
-  ]);
-};
-
-const removeForm = (id: number) => {
-  const localForms = getLocalForms();
-  saveLocalForms(localForms.filter((form) => form.id !== id));
-};
-
 const FormList = () => {
   const [forms, setForms] = useState(() => getLocalForms());
   const [{ search }, setQuery] = useQueryParams();
   const [searchString, setSearchString] = useState('');
 
+  const addNewForm = () => {
+    setForms((forms) => [
+      ...forms,
+      { title: 'Untitled', formFields, id: Number(new Date()) },
+    ]);
+  };
+
+  const removeForm = (id: number) => {
+    setForms((forms) => forms.filter((form) => form.id !== id));
+  };
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newForms = getLocalForms();
-      if (forms.length !== newForms.length) setForms(newForms);
-    }, 1000);
+    const timeout = setTimeout(() => {
+      saveLocalForms(forms);
+    }, 300);
     return () => {
-      clearInterval(interval);
+      clearTimeout(timeout);
     };
   }, [forms]);
 
