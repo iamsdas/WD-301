@@ -2,11 +2,11 @@ import { Link, useQueryParams } from 'raviger';
 import { useEffect, useState } from 'react';
 
 const formFields: IField[] = [
-  { label: 'First Name', id: 1, type: 'text', value: '' },
-  { label: 'Last Name', id: 2, type: 'text', value: '' },
-  { label: 'Email', id: 3, type: 'email', value: '' },
-  { label: 'Phone Number', id: 4, type: 'number', value: '' },
-  { label: 'Date of Birth', id: 5, type: 'date', value: '' },
+  { label: 'First Name', id: 1, type: 'text' },
+  { label: 'Last Name', id: 2, type: 'text' },
+  { label: 'Email', id: 3, type: 'email' },
+  { label: 'Phone Number', id: 4, type: 'number' },
+  { label: 'Date of Birth', id: 5, type: 'date' },
 ];
 
 export const saveLocalForms = (localForms: IFormData[]) => {

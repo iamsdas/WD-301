@@ -8,8 +8,12 @@ import Preview from '../pages/Preview';
 const routes = {
   '/': () => <Home />,
   '/about': () => <About />,
-  '/form/:id': ({ id }: { id: string }) => <Form formId={Number(id)} />,
-  '/preview/:id': ({ id }: { id: string }) => <Preview formId={Number(id)} />,
+  '/form/:formId': ({ formId }: { formId: string }) => (
+    <Form formId={Number(formId)} />
+  ),
+  '/preview/:formId': ({ formId }: { formId: string }) => (
+    <Preview formId={Number(formId)} />
+  ),
 };
 
 export default function AppRouter() {

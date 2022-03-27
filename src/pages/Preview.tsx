@@ -1,50 +1,35 @@
 import { useState, useEffect } from 'react';
 import { getLocalForms } from './Home';
-import { saveLocalForms } from './Home';
-import { Link } from 'raviger';
+import { Link, navigate } from 'raviger';
 import PreviewInput from '../components/PreviewInput';
-
-const saveFormData = (currState: IFormData) => {
-  const localForms = getLocalForms();
-  const updateLocalForms = localForms.map((form) =>
-    form.id === currState.id ? currState : form
-  );
-  saveLocalForms(updateLocalForms);
-};
 
 const initState = (id: number) => {
   const forms = getLocalForms();
-  return forms.find((form) => form.id === id)!;
+  let form = forms.find((form) => form.id === id);
+  if (!form) form = { id, title: 'not found', formFields: [] };
+  return form;
 };
 
 const Preview = ({ formId }: { formId: number }) => {
-  const [state, setState] = useState(() => initState(formId));
+  const [state] = useState(() => initState(formId));
   const [question, setQuestion] = useState(0);
+  const [answers, setAnswers] = useState(state.formFields.map((_) => ''));
   const field = state.formFields[question];
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      saveFormData(state);
-    }, 1000);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [state]);
+    if (!getLocalForms().find((form) => form.id === formId)) navigate('/');
+  });
 
-  const updateField = (id: number, newVal: string) => {
-    setState((state) => ({
-      ...state,
-      formFields: state.formFields.map((field) =>
-        field.id === id ? { ...field, value: newVal } : field
-      ),
-    }));
+  const updateField = (newVal: string) => {
+    setAnswers((values) => {
+      const newVals = [...values];
+      newVals[question] = newVal;
+      return newVals;
+    });
   };
 
   const clearForm = () => {
-    setState((state) => ({
-      ...state,
-      formFields: state.formFields.map((field) => ({ ...field, value: '' })),
-    }));
+    setAnswers((values) => values.map((_) => ''));
   };
 
   const nextQuestion = () => {
@@ -70,14 +55,17 @@ const Preview = ({ formId }: { formId: number }) => {
         </div>
       </div>
       <div className='pt-4'>
-        {
+        {question < answers.length ? (
           <PreviewInput
             key={field.id}
             field={field}
+            value={answers[question]}
             updateFieldCB={updateField}
             nextQuestionCB={nextQuestion}
           />
-        }
+        ) : (
+          <div>No Questions</div>
+        )}
       </div>
       <div className='pt-4 flex gap-2 justify-between text-gray-700'>
         <button
