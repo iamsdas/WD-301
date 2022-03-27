@@ -19,6 +19,8 @@ const initState = (id: number) => {
 
 const Preview = ({ formId }: { formId: number }) => {
   const [state, setState] = useState(() => initState(formId));
+  const [question, setQuestion] = useState(0);
+  const field = state.formFields[question];
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -45,32 +47,56 @@ const Preview = ({ formId }: { formId: number }) => {
     }));
   };
 
+  const nextQuestion = () => {
+    if (question !== state.formFields.length - 1)
+      setQuestion((question) => question + 1);
+  };
+
   return (
     <div className='divide-y-2 divide-dashed space-y-5'>
-      <div className='text-xl font-bold text-center'>{state.title}</div>
+      <div className='flex justify-between items-center'>
+        <div className='text-xl font-bold'>{state.title}</div>
+        <div className='flex gap-2'>
+          <Link
+            className='bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-lg'
+            href='/'>
+            Close
+          </Link>
+          <button
+            className='bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-lg'
+            onClick={clearForm}>
+            Clear
+          </button>
+        </div>
+      </div>
       <div className='pt-4'>
-        {state.formFields.map((field) => (
+        {
           <PreviewInput
             key={field.id}
             field={field}
             updateFieldCB={updateField}
+            nextQuestionCB={nextQuestion}
           />
-        ))}
+        }
       </div>
-      <div className='pt-4 flex gap-2'>
-        <button className='bg-blue-500 p-2 rounded-lg text-white font-bold'>
-          Submit
-        </button>
+      <div className='pt-4 flex gap-2 justify-between text-gray-700'>
         <button
-          className='bg-blue-500 p-2 rounded-lg text-white font-bold'
-          onClick={clearForm}>
-          Clear Form
+          className='hover:text-blue-600 disabled:text-gray-400'
+          disabled={question === 0}
+          onClick={() => {
+            setQuestion((question) => question - 1);
+          }}>
+          Previous Question
         </button>
-        <Link
-          className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg'
-          href='/'>
-          Close Form
-        </Link>
+        {question !== state.formFields.length - 1 ? (
+          <button className='hover:text-blue-600' onClick={nextQuestion}>
+            Next Question
+          </button>
+        ) : (
+          <button className='bg-blue-500 hover:bg-blue-700 py-1 px-2 rounded-lg text-white font-bold'>
+            Submit
+          </button>
+        )}
       </div>
     </div>
   );

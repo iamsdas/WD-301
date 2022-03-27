@@ -1,7 +1,7 @@
 interface IField {
   id: number;
   label: string;
-  type: string;
+  type: 'text' | 'email' | 'number' | 'date';
   value: string;
 }
 
