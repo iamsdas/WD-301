@@ -21,11 +21,9 @@ const Preview = ({ formId }: { formId: number }) => {
   });
 
   const updateField = (newVal: string) => {
-    setAnswers((values) => {
-      const newVals = [...values];
-      newVals[question] = newVal;
-      return newVals;
-    });
+    setAnswers((values) =>
+      values.map((value, index) => (index === question ? newVal : value))
+    );
   };
 
   const clearForm = () => {
@@ -55,7 +53,7 @@ const Preview = ({ formId }: { formId: number }) => {
         </div>
       </div>
       <div className='pt-4'>
-        {question < answers.length ? (
+        {state.formFields.length ? (
           <PreviewInput
             key={field.id}
             field={field}
@@ -70,14 +68,17 @@ const Preview = ({ formId }: { formId: number }) => {
       <div className='pt-4 flex gap-2 justify-between text-gray-700'>
         <button
           className='hover:text-blue-600 disabled:text-gray-400'
-          disabled={question === 0}
+          disabled={!question || !state.formFields.length}
           onClick={() => {
             setQuestion((question) => question - 1);
           }}>
           Previous Question
         </button>
         {question !== state.formFields.length - 1 ? (
-          <button className='hover:text-blue-600' onClick={nextQuestion}>
+          <button
+            className='hover:text-blue-600 disabled:text-gray-400'
+            onClick={nextQuestion}
+            disabled={state.formFields.length === 0}>
             Next Question
           </button>
         ) : (
