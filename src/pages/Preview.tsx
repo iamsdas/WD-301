@@ -38,15 +38,15 @@ const Preview = ({ formId }: { formId: number }) => {
   return (
     <div className='divide-y-2 divide-dashed space-y-5'>
       <div className='flex justify-between items-center'>
-        <div className='text-xl font-bold'>{state.title}</div>
+        <div className='text-2xl font-semibold'>{state.title}</div>
         <div className='flex gap-2'>
           <Link
-            className='bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-lg'
+            className='border-red-500 border-2 hover:border-red-700 text-red-500 hover:text-red-700 text-md py-1 px-2 rounded-lg items-center font-semibold'
             href='/'>
             Close
           </Link>
           <button
-            className='bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-lg'
+            className='border-gray-500 border-2 hover:border-gray-700 text-gray-500 hover:text-gray-700 text-md py-1 px-2 rounded-lg items-center font-semibold'
             onClick={clearForm}>
             Clear
           </button>
@@ -62,7 +62,7 @@ const Preview = ({ formId }: { formId: number }) => {
             nextQuestionCB={nextQuestion}
           />
         ) : (
-          <div>No Questions</div>
+          <div className='text-center py-4 capitalize'>No Questions</div>
         )}
       </div>
       <div className='pt-4 flex gap-2 justify-between text-gray-700'>
@@ -82,7 +82,7 @@ const Preview = ({ formId }: { formId: number }) => {
             Next Question
           </button>
         ) : (
-          <button className='bg-blue-500 hover:bg-blue-700 py-1 px-2 rounded-lg text-white font-bold'>
+          <button className='border-blue-500 border-2 hover:border-blue-700 text-blue-500 hover:text-blue-700 text-md py-1 px-2 rounded-lg items-center font-semibold'>
             Submit
           </button>
         )}
