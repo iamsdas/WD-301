@@ -1,44 +1,89 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useReducer } from 'react';
 import { getLocalForms } from './Home';
 import { Link, navigate } from 'raviger';
 import PreviewInput from '../components/PreviewInput';
 
-const initState = (id: number) => {
+interface IState {
+  question: number;
+  answers: string[];
+  form: IFormData;
+}
+
+type QuestionActionType = {
+  type: 'next_question' | 'prev_question';
+};
+
+type ClearFormActionType = {
+  type: 'clear';
+};
+
+type UpdateFieldActionType = {
+  type: 'update';
+  val: string;
+};
+
+type ActionType =
+  | QuestionActionType
+  | ClearFormActionType
+  | UpdateFieldActionType;
+
+const reducer = (state: IState, action: ActionType): IState => {
+  switch (action.type) {
+    case 'prev_question':
+      return {
+        ...state,
+        question: state.question !== 0 ? state.question - 1 : state.question,
+      };
+    case 'next_question':
+      return {
+        ...state,
+        question:
+          state.question !== state.form.formFields.length - 1
+            ? state.question + 1
+            : state.question,
+      };
+    case 'clear':
+      return { ...state, answers: state.answers.map((_) => '') };
+    case 'update':
+      return {
+        ...state,
+        answers: state.answers.map((value, index) =>
+          index === state.question ? action.val : value
+        ),
+      };
+
+    default:
+      return state;
+  }
+};
+
+const initState = (id: number): IState => {
   const forms = getLocalForms();
   let form = forms.find((form) => form.id === id);
   if (!form) form = { id, title: 'not found', formFields: [] };
-  return form;
+  return { form, question: 0, answers: form.formFields.map((_) => '') };
 };
 
 const Preview = ({ formId }: { formId: number }) => {
-  const [state] = useState(() => initState(formId));
-  const [question, setQuestion] = useState(0);
-  const [answers, setAnswers] = useState(state.formFields.map((_) => ''));
-  const field = state.formFields[question];
+  const [state, dispatch] = useReducer(reducer, null, () => initState(formId));
+  const field = state.form.formFields[state.question];
 
   useEffect(() => {
     if (!getLocalForms().find((form) => form.id === formId)) navigate('/');
   });
 
   const updateField = (newVal: string) => {
-    setAnswers((values) =>
-      values.map((value, index) => (index === question ? newVal : value))
-    );
+    dispatch({ type: 'update', val: newVal });
   };
 
   const clearForm = () => {
-    setAnswers((values) => values.map((_) => ''));
-  };
-
-  const nextQuestion = () => {
-    if (question !== state.formFields.length - 1)
-      setQuestion((question) => question + 1);
+    dispatch({ type: 'clear' });
   };
 
   return (
     <div className='divide-y-2 divide-dashed space-y-5'>
       <div className='flex justify-between items-center'>
-        <div className='text-2xl font-semibold'>{state.title}</div>
+        <div className='text-2xl font-semibold'>{state.form.title}</div>
         <div className='flex gap-2'>
           <Link
             className='border-red-500 border-2 hover:border-red-700 text-red-500 hover:text-red-700 text-md py-1 px-2 rounded-lg items-center font-semibold'
@@ -53,13 +98,13 @@ const Preview = ({ formId }: { formId: number }) => {
         </div>
       </div>
       <div className='pt-4'>
-        {state.formFields.length ? (
+        {state.form.formFields.length ? (
           <PreviewInput
             key={field.id}
             field={field}
-            value={answers[question]}
+            value={state.answers[state.question]}
             updateFieldCB={updateField}
-            nextQuestionCB={nextQuestion}
+            nextQuestionCB={() => dispatch({ type: 'next_question' })}
           />
         ) : (
           <div className='text-center py-4 capitalize'>No Questions</div>
@@ -68,17 +113,17 @@ const Preview = ({ formId }: { formId: number }) => {
       <div className='pt-4 flex gap-2 justify-between text-gray-700'>
         <button
           className='hover:text-blue-600 disabled:text-gray-400'
-          disabled={!question || !state.formFields.length}
+          disabled={!state.question || !state.form.formFields.length}
           onClick={() => {
-            setQuestion((question) => question - 1);
+            dispatch({ type: 'prev_question' });
           }}>
           Previous Question
         </button>
-        {question !== state.formFields.length - 1 ? (
+        {state.question !== state.form.formFields.length - 1 ? (
           <button
             className='hover:text-blue-600 disabled:text-gray-400'
-            onClick={nextQuestion}
-            disabled={state.formFields.length === 0}>
+            onClick={() => dispatch({ type: 'next_question' })}
+            disabled={state.form.formFields.length === 0}>
             Next Question
           </button>
         ) : (
