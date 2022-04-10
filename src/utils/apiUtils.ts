@@ -76,3 +76,14 @@ export const updateField = (formId: number, fieldId: number, field: IField) => {
 export const updateForm = (formId: number, form: IFormItem) => {
   return request(`forms/${formId}`, 'PATCH', form);
 };
+
+export const submitForm = (
+  formId: number,
+  answers: { form_field: number; value: string }[]
+) => {
+  return request(`forms/${formId}/submission`, 'POST', { answers });
+};
+
+export const getSubmission = (formId: number) => {
+  return request(`forms/${formId}/submission`);
+};

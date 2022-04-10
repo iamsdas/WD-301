@@ -3,25 +3,20 @@ import { FC, useRef, useEffect, useCallback } from 'react';
 interface IPreviewField {
   field: IField;
   value: string;
+  updateFieldCB: (newVal: string, fieldId: number) => void;
   nextQuestionCB: () => void;
 }
 
-const PreviewInput: FC<IPreviewField> = ({ field, value, nextQuestionCB }) => {
+const PreviewInput: FC<IPreviewField> = ({
+  field,
+  value,
+  nextQuestionCB,
+  updateFieldCB,
+}) => {
   const ref = useRef<any>(null);
   useEffect(() => {
     ref.current?.focus();
   }, [field]);
-
-  useEffect(() => {
-    if (field.kind === 'DROPDOWN') {
-      const timeout = setTimeout(() => {
-        // updateFieldCB(JSON.stringify(multiVals));
-      }, 100);
-      return () => {
-        clearTimeout(timeout);
-      };
-    }
-  }, [field.kind]);
 
   const inputOfType = useCallback(() => {
     switch (field.kind) {
@@ -31,8 +26,7 @@ const PreviewInput: FC<IPreviewField> = ({ field, value, nextQuestionCB }) => {
             className='flex-1 border-2 border-gray-200 rounded-lg p-2 focus:outline-none focus:border-blue-500'
             ref={ref}
             value={value}
-            // onChange={(e) => updateFieldCB(e.target.value)}
-          >
+            onChange={(e) => updateFieldCB(e.target.value, field.id)}>
             {field.options.map((option, index) => (
               <option value={option} key={option + index}>
                 {option}
@@ -50,7 +44,7 @@ const PreviewInput: FC<IPreviewField> = ({ field, value, nextQuestionCB }) => {
                   name='radio-group'
                   checked={option === value}
                   value={option}
-                  // onChange={(e) => updateFieldCB(e.target.value)}
+                  onChange={(e) => updateFieldCB(e.target.value, field.id)}
                 />
                 <span>{option}</span>
               </div>
@@ -64,13 +58,13 @@ const PreviewInput: FC<IPreviewField> = ({ field, value, nextQuestionCB }) => {
             value={value}
             ref={ref}
             onChange={(e) => {
-              // updateFieldCB(e.target.value);
+              updateFieldCB(e.target.value, field.id);
             }}
             className='flex-1 border-2 border-gray-200 rounded-lg p-2 focus:outline-none focus:border-blue-500'
           />
         );
     }
-  }, [field, value]);
+  }, [field, value, updateFieldCB]);
 
   return (
     <form
