@@ -1,47 +1,62 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
+import { removeField, updateField } from '../utils';
 
 interface IFormField {
   field: IField;
+  formId: number;
   removeFieldCB: (id: number) => void;
-  updateLabelCB: (id: number, newLabel: string) => void;
-  removeOptionCB: (option: string, id: number) => void;
 }
 
-const FormInput: FC<IFormField> = ({
-  field,
-  removeFieldCB,
-  updateLabelCB,
-  removeOptionCB,
-}) => {
+const FormInput: FC<IFormField> = ({ formId, field, removeFieldCB }) => {
+  const [fieldLabel, setLabel] = useState(field.label);
+  const [options, setOptions] = useState(field.options);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const updatedField: IField = { ...field, label: fieldLabel, options };
+      updateField(formId, field.id, updatedField);
+    }, 400);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [fieldLabel, field, formId, options]);
+
   return (
     <div className='my-1'>
-      <span className='mx-1 font-light'>{field.type}</span>
+      <span className='mx-1 font-light lowercase'>{field.kind}</span>
       <div className='flex gap-2 items-stretch'>
         <input
           type='text'
-          value={field.label}
+          value={fieldLabel}
           onChange={(e) => {
-            updateLabelCB(field.id, e.target.value);
+            setLabel(e.target.value);
           }}
           className='flex-1 border-2 border-gray-200 rounded-lg p-2 focus:outline-none focus:border-blue-500'
         />
         <button
           className='border-red-500 border-2 hover:border-red-700 text-red-500 hover:text-red-700 text-md py-1 px-2 rounded-lg items-center font-semibold'
-          onClick={() => removeFieldCB(field.id)}>
+          onClick={() => {
+            removeField(formId, field.id);
+            removeFieldCB(field.id);
+          }}>
           Remove
         </button>
       </div>
       <>
-        {field.kind === 'multi_option' && (
+        {(field.kind === 'DROPDOWN' || field.kind === 'RADIO') && (
           <div className='flex gap-2 flex-wrap my-1'>
-            {field.options.map((option, index) => (
+            {options.map((option, index) => (
               <div
                 key={option + index}
                 className='bg-gray-200 rounded-2xl p-2 flex'>
                 <div>{option}</div>
                 <button
                   className='text-gray-500 hover:text-gray-700 pl-1'
-                  onClick={() => removeOptionCB(option, field.id)}>
+                  onClick={() => {
+                    setOptions((options) =>
+                      options.filter((opt) => opt !== option)
+                    );
+                  }}>
                   x
                 </button>
               </div>

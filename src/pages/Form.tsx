@@ -1,125 +1,52 @@
-import { useEffect, useRef, useReducer } from 'react';
-import { getLocalForms } from './Home';
-import { saveLocalForms } from './Home';
 import { Link } from 'raviger';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import FormInput from '../components/FormInput';
 import NewFieldInput from '../components/NewFieldInput';
+import { getForm, getFields, updateForm } from '../utils';
 
-const saveFormData = (currState: IFormData) => {
-  const localForms = getLocalForms();
-  const updateLocalForms = localForms.map((form) =>
-    form.id === currState.id ? currState : form
-  );
-  saveLocalForms(updateLocalForms);
-};
-
-const initState = (id: number) => {
-  const forms = getLocalForms();
-  return forms.find((form) => form.id === id)!;
-};
-
-enum ActionTypes {
-  ADD_FIELD,
-  REMOVE_FIELD,
-  REMOVE_OPTION,
-  UPDATE_LABEL,
-  UPDATE_TITLE,
-}
-
-type RemoveFieldActionType = {
-  type: ActionTypes.REMOVE_FIELD;
-  id: number;
-};
-
-type RemoveOptionActionType = {
-  type: ActionTypes.REMOVE_OPTION;
-  id: number;
-  option: string;
-};
-
-type AddFieldActionType = {
-  type: ActionTypes.ADD_FIELD;
-  field: IField;
-};
-
-type UpdateLabelActionType = {
-  type: ActionTypes.UPDATE_LABEL;
-  id: number;
-  newLabel: string;
-};
-
-type UpdateTitleActionType = {
-  type: ActionTypes.UPDATE_TITLE;
-  title: string;
-};
-
-type FormAction =
-  | RemoveFieldActionType
-  | RemoveOptionActionType
-  | AddFieldActionType
-  | UpdateLabelActionType
-  | UpdateTitleActionType;
-
-const reducer = (state: IFormData, action: FormAction): IFormData => {
-  switch (action.type) {
-    case ActionTypes.ADD_FIELD:
-      return {
-        ...state,
-        formFields: [
-          ...state.formFields,
-          {
-            ...action.field,
-            id: state.formFields.length + 1,
-          },
-        ],
-      };
-    case ActionTypes.REMOVE_FIELD:
-      return {
-        ...state,
-        formFields: state.formFields.filter((field) => field.id !== action.id),
-      };
-    case ActionTypes.UPDATE_LABEL:
-      return {
-        ...state,
-        formFields: state.formFields.map((field) =>
-          field.id === action.id ? { ...field, label: action.newLabel } : field
-        ),
-      };
-    case ActionTypes.REMOVE_OPTION:
-      return {
-        ...state,
-        formFields: state.formFields.map((field) =>
-          field.id === action.id && field.kind === 'multi_option'
-            ? {
-                ...field,
-                options: field.options.filter((opt) => opt !== action.option),
-              }
-            : field
-        ),
-      };
-    case ActionTypes.UPDATE_TITLE:
-      return { ...state, title: action.title };
-    default:
-      return state;
-  }
+const defaultItem: IFormItem = {
+  id: -1,
+  title: '',
+  description: '',
+  is_public: false,
 };
 
 const Form = ({ formId }: { formId: number }) => {
-  const ref = useRef<HTMLInputElement>(null);
-  const [state, dispatch] = useReducer(reducer, null, () => initState(formId));
+  const [formItem, setFormItem] = useState<IFormItem>(defaultItem);
+  const [fields, setFields] = useState<IField[]>([]);
+  const [titleName, setTitle] = useState('');
+  const ref = useRef(null);
+
+  const initState = useCallback(async () => {
+    const formItemData: IFormItem = await getForm(formId);
+    const formFieldsData: IPaginated<IField> = await getFields(formId);
+    setFormItem(formItemData);
+    setTitle(formItemData.title);
+    setFields(formFieldsData.results);
+  }, [formId]);
+
+  const removeField = useCallback(
+    (fieldId: number) => {
+      setFields(fields.filter((field) => field.id !== fieldId));
+    },
+    [fields]
+  );
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      saveFormData(state);
-    }, 1000);
+    const timeout = setTimeout(async () => {
+      if (formItem.title !== titleName) {
+        const updatedForm: IFormItem = { ...formItem, title: titleName };
+        updateForm(formId, updatedForm);
+      }
+    }, 500);
     return () => {
       clearTimeout(timeout);
     };
-  }, [state]);
+  }, [formId, formItem, initState, titleName]);
 
   useEffect(() => {
-    ref.current?.focus();
-  }, []);
+    initState();
+  }, [initState]);
 
   return (
     <div className='divide-y-2 divide-dashed space-y-5'>
@@ -127,29 +54,20 @@ const Form = ({ formId }: { formId: number }) => {
         <input
           type='text'
           ref={ref}
-          value={state.title}
-          onChange={(e) => {
-            dispatch({ type: ActionTypes.UPDATE_TITLE, title: e.target.value });
-          }}
+          value={titleName}
+          onChange={(e) => setTitle(e.target.value)}
           className='flex-1 border-2 border-gray-200 rounded-lg p-2  focus:outline-none focus:border-blue-500'
         />
       </div>
 
       <div className='pt-4'>
-        {state.formFields.length ? (
-          state.formFields.map((field) => (
+        {fields.length ? (
+          fields.map((field) => (
             <FormInput
+              formId={formId}
               key={field.id}
               field={field}
-              removeOptionCB={(option, id) =>
-                dispatch({ type: ActionTypes.REMOVE_OPTION, id, option })
-              }
-              removeFieldCB={(id) =>
-                dispatch({ type: ActionTypes.REMOVE_FIELD, id })
-              }
-              updateLabelCB={(id, newLabel) =>
-                dispatch({ type: ActionTypes.UPDATE_LABEL, id, newLabel })
-              }
+              removeFieldCB={removeField}
             />
           ))
         ) : (
@@ -157,9 +75,7 @@ const Form = ({ formId }: { formId: number }) => {
         )}
       </div>
 
-      <NewFieldInput
-        addFieldCB={(field) => dispatch({ type: ActionTypes.ADD_FIELD, field })}
-      />
+      <NewFieldInput formId={formItem.id!} refreshFormCB={initState} />
 
       <div className='pt-4 flex gap-2'>
         <Link

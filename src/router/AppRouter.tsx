@@ -1,13 +1,11 @@
 import { useRoutes } from 'raviger';
-import About from '../pages/About';
 import AppContainer from '../components/AppContainer';
-import Form from '../pages/Form';
-import Home from '../pages/Home';
-import Preview from '../pages/Preview';
+import { About, Form, Home, Login, Preview } from '../pages';
 
 const routes = {
   '/': () => <Home />,
   '/about': () => <About />,
+  '/login': () => <Login />,
   '/form/:formId': ({ formId }: { formId: string }) => (
     <Form formId={Number(formId)} />
   ),
@@ -16,7 +14,7 @@ const routes = {
   ),
 };
 
-export default function AppRouter() {
+export default function AppRouter(props: { currentUser: User }) {
   let route = useRoutes(routes);
-  return <AppContainer>{route}</AppContainer>;
+  return <AppContainer currentUser={props.currentUser}>{route}</AppContainer>;
 }

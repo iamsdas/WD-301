@@ -1,40 +1,33 @@
 import { FormEvent, useState } from 'react';
+import { addField } from '../utils';
 
 const NewFieldInput = ({
-  addFieldCB,
+  formId,
+  refreshFormCB,
 }: {
-  addFieldCB: (field: IField) => void;
+  formId: number;
+  refreshFormCB: () => Promise<void>;
 }) => {
   const [newField, setNewField] = useState('');
   const [newOption, setNewOption] = useState('');
-  const [type, setType] = useState('text');
+  const [type, setType] = useState<FieldType>('TEXT');
   const [options, setOptions] = useState<string[]>([]);
-  const [multiOption, setMultiOption] = useState(false);
 
   const typeChangehandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setMultiOption(
-      ['dropdown', 'radio', 'multiselect'].includes(e.target.value)
-    );
-    setType(e.target.value);
+    setType(e.target.value as FieldType);
   };
 
-  const formSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
+  const formSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const field: IField = multiOption
-      ? {
-          id: 0,
-          kind: 'multi_option',
-          label: newField,
-          type: type as MultiOptionFieldType,
-          options,
-        }
-      : {
-          id: 0,
-          kind: 'single_option',
-          label: newField,
-          type: type as SignOptionFieldType,
-        };
-    addFieldCB(field);
+    const field: Partial<IField> = {
+      kind: type,
+      label: newField,
+      options,
+      value: '',
+    };
+
+    await addField(formId, field);
+    refreshFormCB();
     setNewField('');
     setOptions([]);
   };
@@ -56,11 +49,9 @@ const NewFieldInput = ({
           value={type}
           onChange={typeChangehandler}
           className='text-ellipsis rounded-lg text-center p-1 bg-white border-2'>
-          <option value='text'>text</option>
-          <option value='dropdown'>dropdown</option>
-          <option value='multiselect'>multiselect</option>
-          <option value='radio'>radio</option>
-          <option value='textarea'>textarea</option>
+          <option value='TEXT'>text</option>
+          <option value='DROPDOWN'>dropdown</option>
+          <option value='RADIO'>radio</option>
         </select>
 
         <button
@@ -70,7 +61,7 @@ const NewFieldInput = ({
         </button>
       </form>
 
-      {multiOption && (
+      {(type === 'DROPDOWN' || type === 'RADIO') && (
         <div>
           <div className='flex gap-2 flex-wrap'>
             {options.map((option, index) => (

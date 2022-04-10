@@ -1,7 +1,7 @@
 import { ActiveLink } from 'raviger';
 import logo from '../logo.svg';
 
-const Header = () => {
+const Header = (props: { currentUser: User }) => {
   return (
     <div className='flex gap-2 items-center font-semibold pb-4'>
       <img src={logo} className='animate-spin h-16' alt='logo' />
@@ -9,15 +9,33 @@ const Header = () => {
         {[
           { page: 'home', url: '/' },
           { page: 'about', url: '/about' },
-        ].map((link) => (
-          <ActiveLink
-            href={link.url}
-            exactActiveClass='text-blue-600'
-            className='px-1'
-            key={link.url}>
-            {link.page}
-          </ActiveLink>
-        ))}
+          props.currentUser?.username.length > 0
+            ? {
+                page: 'logout',
+                onclick: () => {
+                  localStorage.removeItem('token');
+                  window.location.reload();
+                },
+              }
+            : { page: 'login', url: '/login' },
+        ].map((link) =>
+          link.url ? (
+            <ActiveLink
+              href={link.url}
+              exactActiveClass='text-blue-600'
+              className='px-1'
+              key={link.url}>
+              {link.page}
+            </ActiveLink>
+          ) : (
+            <button
+              key={link.page}
+              className='px-1 uppercase font-semibold'
+              onClick={link.onclick}>
+              {link.page}
+            </button>
+          )
+        )}
       </div>
     </div>
   );

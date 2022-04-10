@@ -72,10 +72,6 @@ const Preview = ({ formId }: { formId: number }) => {
     if (!getLocalForms().find((form) => form.id === formId)) navigate('/');
   });
 
-  const updateField = (newVal: string) => {
-    dispatch({ type: 'update', val: newVal });
-  };
-
   const clearForm = () => {
     dispatch({ type: 'clear' });
   };
@@ -103,7 +99,6 @@ const Preview = ({ formId }: { formId: number }) => {
             key={field.id}
             field={field}
             value={state.answers[state.question]}
-            updateFieldCB={updateField}
             nextQuestionCB={() => dispatch({ type: 'next_question' })}
           />
         ) : (
