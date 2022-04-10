@@ -1,6 +1,6 @@
 import AppRouter from './router/AppRouter';
 import { useEffect, useState, useCallback } from 'react';
-import { me } from './utils';
+import { me, userContext } from './utils';
 import { usePath } from 'raviger';
 
 function App() {
@@ -22,7 +22,11 @@ function App() {
       getCurrentUser();
   }, [path, currentUser, getCurrentUser]);
 
-  return <AppRouter currentUser={currentUser} />;
+  return (
+    <userContext.Provider value={currentUser}>
+      <AppRouter />
+    </userContext.Provider>
+  );
 }
 
 export default App;

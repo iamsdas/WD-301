@@ -1,7 +1,10 @@
 import { ActiveLink } from 'raviger';
+import { useContext } from 'react';
 import logo from '../logo.svg';
+import { userContext } from '../utils';
 
-const Header = (props: { currentUser: User }) => {
+const Header = () => {
+  const currentUser = useContext(userContext);
   return (
     <div className='flex gap-2 items-center font-semibold pb-4'>
       <img src={logo} className='animate-spin h-16' alt='logo' />
@@ -9,7 +12,7 @@ const Header = (props: { currentUser: User }) => {
         {[
           { page: 'home', url: '/' },
           { page: 'about', url: '/about' },
-          props.currentUser?.username.length > 0
+          currentUser?.username.length > 0
             ? {
                 page: 'logout',
                 onclick: () => {
