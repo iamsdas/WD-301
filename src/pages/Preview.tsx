@@ -58,7 +58,7 @@ const Preview = ({ formId }: { formId: number }) => {
   };
 
   return loading ? (
-    <div className='flex w-full justify-center items-center'>
+    <div className='flex w-full justify-center items-center py-6'>
       <svg
         role='status'
         className='mr-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-gray-300'
