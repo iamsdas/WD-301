@@ -52,7 +52,7 @@ const Form = ({ formId }: { formId: number }) => {
   }, [initState]);
 
   return loading ? (
-    <div className='flex w-full justify-center items-center'>
+    <div className='flex w-full justify-center items-center py-6'>
       <svg
         aria-hidden='true'
         role='status'
