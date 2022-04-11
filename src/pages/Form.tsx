@@ -54,6 +54,7 @@ const Form = ({ formId }: { formId: number }) => {
   return loading ? (
     <div className='flex w-full justify-center items-center'>
       <svg
+        aria-hidden='true'
         role='status'
         className='mr-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-gray-300'
         viewBox='0 0 100 101'
@@ -74,12 +75,13 @@ const Form = ({ formId }: { formId: number }) => {
           type='text'
           ref={ref}
           value={titleName}
+          aria-label='Title Name'
           onChange={(e) => setTitle(e.target.value)}
-          className='flex-1 border-2 border-gray-200 rounded-lg p-2  focus:outline-none focus:border-blue-500'
+          className='flex-1 border-2 border-gray-200 rounded-lg p-2 focus:outline-none focus:border-blue-500'
         />
       </div>
 
-      <div className='pt-4'>
+      <ul className='pt-4'>
         {fields.length ? (
           fields.map((field) => (
             <FormInput
@@ -92,7 +94,7 @@ const Form = ({ formId }: { formId: number }) => {
         ) : (
           <div className='text-center py-4 capitalize'>no fields</div>
         )}
-      </div>
+      </ul>
 
       <NewFieldInput formId={formItem.id!} refreshFormCB={initState} />
 

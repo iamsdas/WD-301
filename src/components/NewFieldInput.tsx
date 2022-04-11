@@ -37,6 +37,7 @@ const NewFieldInput = ({
       <form className='flex justify-between gap-2' onSubmit={formSubmitHandler}>
         <input
           type='text'
+          aria-label='New Field Label'
           value={newField}
           onChange={(e) => {
             setNewField(e.target.value);
@@ -46,6 +47,7 @@ const NewFieldInput = ({
 
         <select
           name='type'
+          aria-label='Field Type'
           value={type}
           onChange={typeChangehandler}
           className='text-ellipsis rounded-lg text-center p-1 bg-white border-2'>
@@ -63,9 +65,9 @@ const NewFieldInput = ({
 
       {(type === 'DROPDOWN' || type === 'RADIO') && (
         <div>
-          <div className='flex gap-2 flex-wrap'>
+          <ul className='flex gap-2 flex-wrap'>
             {options.map((option, index) => (
-              <div
+              <li
                 key={option + index}
                 className='bg-gray-200 rounded-2xl p-2 flex'>
                 <div>{option}</div>
@@ -78,9 +80,9 @@ const NewFieldInput = ({
                   className='text-gray-500 hover:text-gray-700 pl-1'>
                   x
                 </button>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
           <form
             className='flex justify-start items-center gap-2 pt-2'
             onSubmit={(e) => {
@@ -91,6 +93,7 @@ const NewFieldInput = ({
             }}>
             <input
               type='text'
+              aria-label='New Option'
               value={newOption}
               onChange={(e) => {
                 setNewOption(e.target.value);

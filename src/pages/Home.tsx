@@ -52,6 +52,7 @@ const FormList = () => {
     <div>
       <input
         type='text'
+        aria-label='search'
         placeholder='Search Form'
         value={searchString}
         onChange={(e) => {

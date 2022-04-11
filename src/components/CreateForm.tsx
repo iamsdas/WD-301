@@ -56,7 +56,7 @@ const CreateForm = () => {
         </div>
         {errors.title && <p className='text-red-500'>{errors.title}</p>}
         <div className='space-y-1'>
-          <label htmlFor='title' className='text-lg block'>
+          <label htmlFor='description' className='text-lg block'>
             Description
           </label>
           <input

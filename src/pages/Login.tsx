@@ -25,18 +25,20 @@ const Login = () => {
   return (
     <form onSubmit={handleSubmit} className='space-y-3 w-full md:px-4'>
       <div>
-        <p>Username</p>
+        <label htmlFor='username'>Username</label>
         <input
           type='text'
           name='username'
+          id='username'
           className='w-full border-2 border-gray-200 rounded-lg p-2 focus:outline-none focus:border-blue-500'
         />
       </div>
       <div>
-        <p>Password</p>
+        <label htmlFor='password'>Password</label>
         <input
           type='password'
           name='password'
+          id='password'
           className='w-full border-2 border-gray-200 rounded-lg p-2 focus:outline-none focus:border-blue-500'
         />
       </div>

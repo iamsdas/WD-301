@@ -22,11 +22,12 @@ const FormInput: FC<IFormField> = ({ formId, field, removeFieldCB }) => {
   }, [fieldLabel, field, formId, options]);
 
   return (
-    <div className='my-1'>
+    <li className='my-1'>
       <span className='mx-1 font-light lowercase'>{field.kind}</span>
       <div className='flex gap-2 items-stretch'>
         <input
           type='text'
+          aria-label='Field Label'
           value={fieldLabel}
           onChange={(e) => {
             setLabel(e.target.value);
@@ -64,7 +65,7 @@ const FormInput: FC<IFormField> = ({ formId, field, removeFieldCB }) => {
           </div>
         )}
       </>
-    </div>
+    </li>
   );
 };
 

@@ -40,13 +40,16 @@ const PreviewInput: FC<IPreviewField> = ({
             {field.options.map((option, index) => (
               <div key={option + index} className='space-x-2'>
                 <input
+                  id={option}
                   type='radio'
-                  name='radio-group'
+                  name={field.label}
+                  aria-label={field.label}
+                  aria-checked={option === value}
                   checked={option === value}
                   value={option}
                   onChange={(e) => updateFieldCB(e.target.value, field.id)}
                 />
-                <span>{option}</span>
+                <label htmlFor={option}>{option}</label>
               </div>
             ))}
           </div>
@@ -55,6 +58,7 @@ const PreviewInput: FC<IPreviewField> = ({
         return (
           <input
             type='text'
+            aria-label={field.label}
             value={value}
             ref={ref}
             onChange={(e) => {
