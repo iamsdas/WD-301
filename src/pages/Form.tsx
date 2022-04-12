@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import FormInput from '../components/FormInput';
 import NewFieldInput from '../components/NewFieldInput';
 import { getForm, getFields, updateForm, notify } from '../utils';
+import ShareForm from '../components/ShareForm';
 
 const defaultItem: IFormItem = {
   id: -1,
@@ -76,15 +77,16 @@ const Form = ({ formId }: { formId: number }) => {
     </div>
   ) : (
     <div className='divide-y-2 divide-dashed space-y-5'>
-      <div>
+      <div className='flex justify-between items-center'>
         <input
           type='text'
           ref={ref}
           value={titleName}
           aria-label='Title Name'
           onChange={(e) => setTitle(e.target.value)}
-          className='flex-1 border-2 border-gray-200 rounded-lg p-2 focus:outline-none focus:border-blue-500'
+          className='border-2 border-gray-200 rounded-lg p-2 focus:outline-none focus:border-blue-500'
         />
+        <ShareForm />
       </div>
 
       <ul className='pt-4'>
