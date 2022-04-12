@@ -2,7 +2,7 @@ import { Link } from 'raviger';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import FormInput from '../components/FormInput';
 import NewFieldInput from '../components/NewFieldInput';
-import { getForm, getFields, updateForm } from '../utils';
+import { getForm, getFields, updateForm, notify } from '../utils';
 
 const defaultItem: IFormItem = {
   id: -1,
@@ -20,11 +20,15 @@ const Form = ({ formId }: { formId: number }) => {
 
   const initState = useCallback(async () => {
     setLoading(true);
-    const formItemData: IFormItem = await getForm(formId);
-    const formFieldsData: IPaginated<IField> = await getFields(formId);
-    setFormItem(formItemData);
-    setTitle(formItemData.title);
-    setFields(formFieldsData.results);
+    try {
+      const formItemData: IFormItem = await getForm(formId);
+      const formFieldsData: IPaginated<IField> = await getFields(formId);
+      setFormItem(formItemData);
+      setTitle(formItemData.title);
+      setFields(formFieldsData.results);
+    } catch (e) {
+      notify('danger', 'Error fetching form');
+    }
     setLoading(false);
   }, [formId]);
 
@@ -39,7 +43,9 @@ const Form = ({ formId }: { formId: number }) => {
     const timeout = setTimeout(async () => {
       if (formItem.title !== titleName) {
         const updatedForm: IFormItem = { ...formItem, title: titleName };
-        updateForm(formId, updatedForm);
+        updateForm(formId, updatedForm).catch((e) =>
+          notify('danger', 'Error updating form')
+        );
       }
     }, 500);
     return () => {
