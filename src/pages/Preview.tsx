@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'raviger';
+import { Link, navigate } from 'raviger';
 import PreviewInput from '../components/PreviewInput';
-import { getFields, getForm, submitForm } from '../utils';
+import { getFields, getForm, notify, submitForm } from '../utils';
 
 const defaultItem: IFormItem = {
   id: -1,
@@ -24,10 +24,14 @@ const Preview = ({ formId }: { formId: number }) => {
 
   const initState = useCallback(async () => {
     setLoading(true);
-    const formItemData: IFormItem = await getForm(formId);
-    const formFieldsData: IPaginated<IField> = await getFields(formId);
-    setFormItem(formItemData);
-    setFields(formFieldsData.results);
+    try {
+      const formItemData: IFormItem = await getForm(formId);
+      const formFieldsData: IPaginated<IField> = await getFields(formId);
+      setFormItem(formItemData);
+      setFields(formFieldsData.results);
+    } catch (error) {
+      notify('danger', 'Error loading form');
+    }
     setLoading(false);
   }, [formId]);
 
@@ -126,7 +130,12 @@ const Preview = ({ formId }: { formId: number }) => {
         ) : (
           <button
             onClick={() => {
-              submitForm(formId, answers);
+              submitForm(formId, answers)
+                .then(() => {
+                  notify('success', 'Form Submitted Successfully');
+                  navigate('/');
+                })
+                .catch((e) => notify('danger', 'Error submitting form'));
             }}
             className='border-blue-500 border-2 hover:border-blue-700 text-blue-500 hover:text-blue-700 text-md py-1 px-2 rounded-lg items-center font-semibold'>
             Submit

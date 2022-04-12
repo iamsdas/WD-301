@@ -2,6 +2,8 @@ import AppRouter from './router/AppRouter';
 import { useEffect, useState, useCallback } from 'react';
 import { me, userContext } from './utils';
 import { usePath } from 'raviger';
+import { ReactNotifications } from 'react-notifications-component';
+import 'react-notifications-component/dist/theme.css';
 
 function App() {
   const [currentUser, setCurrentUser] = useState<User>(null);
@@ -24,6 +26,7 @@ function App() {
 
   return (
     <userContext.Provider value={currentUser}>
+      <ReactNotifications />
       <AppRouter />
     </userContext.Provider>
   );
